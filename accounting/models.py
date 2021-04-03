@@ -13,7 +13,7 @@ class EventManager(models.Manager):
 
 class Event(models.Model):
     """
-    Single accounting event record. Accounting evennt is everything, that affects
+    Single accounting event record. Accounting event is everything, that affects
     teacher payments.
     """
     EVENT_TYPES = (

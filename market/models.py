@@ -104,6 +104,9 @@ class Subscription(ProductContainer):
 
     first_lesson_date = models.DateTimeField('Date of the first lesson', editable=False, null=True)
 
+    # time when last notifications sent, next send do after a while. If null - no notifications was sent
+    when_waste_money_notification_sent = models.DateTimeField(null=True)
+
     def __str__(self):
         return self.name_for_user
 
@@ -151,7 +154,7 @@ class Subscription(ProductContainer):
     def deactivate(self, user=None):
         """
         When the subscription is disabled for any reasons, all lessons
-        assosciated to it, should be disabled too.
+        associated to it, should be disabled too.
         """
         for c in self.classes.filter(is_fully_used=False):
             c.deactivate()
@@ -175,6 +178,21 @@ class Subscription(ProductContainer):
             if first_class:
                 self.first_lesson_date = first_class.timeline.start
                 self.save()
+
+    def is_subscription_begin_expire(self) -> bool:
+        """
+        :return: True if subscription (only active) not used last week
+        """
+        if self.is_due():
+            return False
+
+        expire_date = timezone.now() + timedelta(days=settings.WASTE_MONEY_NOTIFY_FIRST_DELAY_DAYS)
+        if self.classes.filter(timeline__isnull=False).exists():
+            return self.classes.filter(
+                timeline__isnull=False,
+                timeline__start__gt=expire_date
+            ).exists()
+        return self.buy_date > expire_date
 
     def class_status(self):
         """
@@ -225,6 +243,7 @@ class ClassesManager(ProductContainerManager):
     Almost all of this methods assume, that they are called from a related
     manager customer.classes, like customer.classes.nearest()
     """
+
     def nearest_scheduled(self, **kwargs):
         """
         Return nearest scheduled class
@@ -346,8 +365,8 @@ class Class(ProductContainer):
 
     Deleting a class
     ================
-    Currently we need posibility to unschedule a class through django-admin.
-    This is done by deleting — the classs delete() method checks, if class is
+    Currently we need possibility to unschedule a class through django-admin.
+    This is done by deleting — the class' delete() method checks, if class is
     scheduled, and if it is, delete() just un-schedules it.
 
     For backup purposes, the delete method is redefined in :model:`market.BuyableProduct`
@@ -362,15 +381,17 @@ class Class(ProductContainer):
 
     lesson_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, limit_choices_to={'app_label': 'lessons'})
 
-    timeline = models.ForeignKey('timeline.Entry', null=True, blank=True, on_delete=models.SET_NULL, related_name='classes')
+    timeline = models.ForeignKey('timeline.Entry', null=True, blank=True, on_delete=models.SET_NULL,
+                                 related_name='classes')
 
-    subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE, null=True, blank=True, related_name='classes')
+    subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE, null=True, blank=True,
+                                     related_name='classes')
 
     pre_start_notifications_sent_to_teacher = models.BooleanField(default=False)
     pre_start_notifications_sent_to_student = models.BooleanField(default=False)
 
     class Meta:
-        verbose_name = 'Purchsed lesson'
+        verbose_name = 'Purchased lesson'
         get_latest_by = 'buy_date'
 
     @property
@@ -524,7 +545,8 @@ class Class(ProductContainer):
             self.customer.cancellation_streak += 1
             self.customer.save()
 
-        if src != 'dangerous-cancellation' and (self.timeline.start + MARK_CLASSES_AS_USED_AFTER) < timezone.now():  # teachers can cancel classes even after they started
+        if src != 'dangerous-cancellation' and (
+            self.timeline.start + MARK_CLASSES_AS_USED_AFTER) < timezone.now():  # teachers can cancel classes even after they started
             raise ValidationError('Past classes cannot be cancelled')
 
         signals.class_cancelled.send(sender=self.__class__, instance=self, src=src)

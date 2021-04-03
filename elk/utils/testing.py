@@ -13,11 +13,11 @@ from unittest.mock import MagicMock, patch
 
 import pytz
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase as StockTestCase
 from django.test import Client, RequestFactory
 from django.utils import timezone
+from django.contrib.auth.models import User
 from mixer.backend.django import mixer
 from rest_framework.test import APIClient
 from with_asserts.mixin import AssertHTMLMixin

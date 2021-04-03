@@ -1,0 +1,25 @@
+{% extends "mail_templated/base.tpl" %}
+{% load humanize %}
+
+{% block subject %}
+    {% if is_repeat %}Harry up. Your are loosing you money. Return to us and continue learning.{% else %}Your waste you money. Return to us and continue learning.{% endif %}
+{% endblock %}
+
+{% block body %}
+    Dear {{ subscription.customer.first_name | capfirst }},
+    {% if subscription.max_lesson_date %}
+        You not use your subscription since {{ subscription.max_lesson_date | naturalday:'SHORT_DATE_FORMAT' }}
+    {% else %}
+        You not use your subscription since bought subscription ({{ subscription.buy_date | naturalday:'SHORT_DATE_FORMAT' }})
+    {% endif %}
+
+    {% if is_repeat %}
+        Harry up. Your are loosing your payed money. Return to us and continue learning.
+    {% else %}
+        Your waste you payed money. Return to us and continue learning.
+    {% endif %}
+
+    If you have any questions — simply reply to this message and we'll help you.
+
+    {% include 'mailer/_signature.html' %}
+{% endblock %}

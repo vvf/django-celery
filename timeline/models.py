@@ -124,7 +124,7 @@ class Entry(models.Model):
     protection.
 
     You can check overlapping with the `instance.is_overlapping()` method. Checks will be
-    done automaticaly, when save() is invoced and allow_overlap == False
+    done automatically, when save() is invoiced and allow_overlap == False
 
     Self-deleting
     =============
@@ -156,7 +156,7 @@ class Entry(models.Model):
     are configurable by boolean instance parameters:
         * allow_besides_working_hours: allow entries the don't fit teachers :model:`teachers.WorkingHours`
 
-    By default all this checks are disabled, you should enable them manualy when creating a model:
+    By default all this checks are disabled, you should enable them manually when creating a model:
     ::
         TimelineEntry = apps.get_model('timeline.Entry')
         entry = TimelineEntry(
@@ -284,7 +284,7 @@ class Entry(models.Model):
         Unschedule all attached classes before deletion. Unscheduling a class
         sets it free — user can plan a new lesson on it.
 
-        This is the main method for class cancelation.
+        This is the main method for class cancellation.
         """
         for c in self.classes.all():
             c.cancel(src)
