@@ -4,9 +4,9 @@ from datetime import timedelta
 import environ
 from easy_thumbnails.conf import Settings as thumbnail_settings
 
-root = environ.Path(__file__) - 3  # three folder back (/a/b/c/ - 3 = /)
-env = environ.Env(DEBUG=(bool, False), )  # set default values and casting
-environ.Env.read_env()  # reading .env file
+root = environ.Path(__file__) - 3        # three folder back (/a/b/c/ - 3 = /)
+env = environ.Env(DEBUG=(bool, False),)  # set default values and casting
+environ.Env.read_env()                   # reading .env file
 
 SITE_ROOT = root()
 
@@ -30,7 +30,7 @@ FORMAT_MODULE_PATH = [
     'elk.formats'
 ]
 
-DEBUG = env('DEBUG')  # False if not in os.environ
+DEBUG = env('DEBUG')    # False if not in os.environ
 
 ALLOWED_HOSTS = [
     'a.elk.today',
@@ -49,7 +49,7 @@ ADMINS = [
 ]
 
 DATABASES = {
-    'default': env.db(),  # Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
+    'default': env.db(),    # Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
 }
 
 
@@ -63,18 +63,18 @@ def get_git_revision():
     except:
         return 'dev'
 
-
 VERSION = get_git_revision()
+
 
 INSTALLED_APPS = [
     'elk',
     'crm',  # stuff related to student accounts
     'lessons',  # lesson types — Ordinary lessons, Native speaker lessons etc
     'products',  # staff that student can purchase, i.e. Subscription
-    'market',  # lesson planning takes place here
+    'market',   # lesson planning takes place here
     'timeline',  # teachers curricullom
     'teachers',  # teachers database
-    'acc',  # acc — loggin in and out, homepage
+    'acc',   # acc — loggin in and out, homepage
     'mailer',
     'extevents',  # integrations with external calendars, like Google's one
     'accounting',  # teacher accounting — passed classes, customer inspired cancellation etc
@@ -170,8 +170,7 @@ SUIT_CONFIG = {
         {'app': 'crm', 'icon': 'icon-globe', 'models': ('crm.Customer', 'crm.Company')},
         {'app': 'market', 'icon': 'icon-shopping-cart', 'models': ('market.Subscription', 'market.Class')},
         {'app': 'teachers', 'icon': 'icon-briefcase', },
-        {'app': 'lessons', 'icon': 'icon-headphones', 'label': 'Teaching',
-         'models': ('lessons.Language', 'lessons.PairedLesson', 'lessons.MasterClass', 'lessons.HappyHour')},
+        {'app': 'lessons', 'icon': 'icon-headphones', 'label': 'Teaching', 'models': ('lessons.Language', 'lessons.PairedLesson', 'lessons.MasterClass', 'lessons.HappyHour')},
         {'app': 'products', 'icon': 'icon-list', 'label': 'Products'},
         {'app': 'auth', 'label': 'Authorization', 'icon': 'icon-lock', 'models': ('auth.User', 'auth.Group')},
     ),
@@ -237,6 +236,7 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
 
+
 if not DEBUG:
     RAVEN_CONFIG = {
         'dsn': env('SENTRY_DSN'),
@@ -272,11 +272,12 @@ SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
 
+
 GROOVE_API_TOKEN = env('GROOVE_API_TOKEN')
 
 THUMBNAIL_PROCESSORS = (
-                           'image_cropping.thumbnail_processors.crop_corners',
-                       ) + thumbnail_settings.THUMBNAIL_PROCESSORS
+    'image_cropping.thumbnail_processors.crop_corners',
+) + thumbnail_settings.THUMBNAIL_PROCESSORS
 
 WSGI_APPLICATION = 'elk.wsgi.application'
 
